@@ -4,7 +4,7 @@ library(janitor)
 
 
 #for filtering by selected date below, choose your date here
-chosen_date <- "2020-09-20"
+chosen_date <- "2020-09-27"
 
 
 
@@ -14,6 +14,8 @@ chosen_date <- "2020-09-20"
 
 #import zipped file 
 actblue_contribs_all <- read_csv("raw_data/actblue_oct_monthly_sa1464847.csv.zip", col_types = cols(.default = "c"))
+
+glimpse(actblue_contribs_all)
 
 #format columns and add name column
 actblue_contribs_all <- actblue_contribs_all %>% 
@@ -33,6 +35,8 @@ actblue_contribs_selectdates <- actblue_contribs_all %>%
 
 #save for next steps
 saveRDS(actblue_contribs_selectdates, "processed_data/actblue_contribs_selectdates.rds")
+#save all records versions in case needed
+saveRDS(actblue_contribs_all, "processed_data/actblue_contribs_all.rds")
 
 
 # *expenditures*
@@ -58,8 +62,8 @@ actblue_expends_selectdates <- actblue_expends_all %>%
 
 #save for next steps
 saveRDS(actblue_expends_selectdates, "processed_data/actblue_expends_selectdates.rds")
-
-
+#save all records versions in case needed
+saveRDS(actblue_expends_all, "processed_data/actblue_expends_all.rds")
 
 
 # WINRED FILINGS ####
@@ -87,6 +91,8 @@ winred_contribs_selectdates <- winred_contribs_all %>%
 
 #save for next steps
 saveRDS(winred_contribs_selectdates, "processed_data/winred_contribs_selectdates.rds")
+#save all records versions in case needed
+saveRDS(winred_contribs_all, "processed_data/winred_contribs_all.rds")
 
 
 # *expenditures*
@@ -112,9 +118,8 @@ winred_expends_selectdates <- winred_expends_all %>%
 
 #save for next steps
 saveRDS(winred_expends_selectdates, "processed_data/winred_expends_selectdates.rds")
-
-
-
+#save all records versions in case needed
+saveRDS(winred_expends_all, "processed_data/winred_expends_all.rds")
 
 
 
