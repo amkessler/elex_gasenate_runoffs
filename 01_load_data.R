@@ -3,6 +3,11 @@ library(lubridate)
 library(janitor)
 
 
+#for filtering by selected date below, choose your date here
+chosen_date <- "2020-09-29"
+
+
+
 # ACTBLUE FILINGS ####
 
 # contribs
@@ -22,9 +27,9 @@ actblue_contribs_all <- actblue_contribs_all %>%
 
 glimpse(actblue_contribs_all)
 
-#filter for only records after a specific date
-actblue_contribs_selectdates <- actblue_contribs %>% 
-  filter(date > "2020-09-29")
+#filter for only records after our specified date
+actblue_contribs_selectdates <- actblue_contribs_all %>% 
+  filter(date > chosen_date)
 
 #save for next steps
 saveRDS(actblue_contribs_selectdates, "processed_data/actblue_contribs_selectdates.rds")
