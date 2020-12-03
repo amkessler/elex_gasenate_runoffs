@@ -8,35 +8,123 @@ output:
     toc_float: true
     code_folding: hide
     # code_download: true
+    df_print: kable
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-
-
-
+library(tidyverse)
+library(lubridate)
+library(janitor)
+library(plotly)
+library(widgetframe)
+library(scales)
+library(zoo)
 options(dplyr.summarise.inform = FALSE)
 
+#load data files created in step 01
+actblue_contribs_ga_sencands <- readRDS("output/actblue_contribs_ga_sencands.rds")
+winred_contribs_ga_sencands <- readRDS("output/winred_contribs_ga_sencands.rds")
+
 
 ```
 
-## R Markdown
+## Totals
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+asdfasfdasdf
+aasdfasfsadf  
+asfdasfsd
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+###
+## In-State vs. Out-of-State
+  
+  
+**Dem overall totals**
+```{r}
 
-```{r cars}
-summary(cars)
+dem_inout <- actblue_contribs_ga_sencands %>% 
+  group_by(in_out_state) %>% 
+  summarise(total_dollars = sum(amount)) %>% 
+  ungroup()
+
+dem_inout
 ```
 
-## Including Plots
+**Dem candidate totals**
+```{r}
 
-You can also embed plots, for example:
+dem_inout_bycand <- actblue_contribs_ga_sencands %>% 
+  group_by(ga_candidate, in_out_state) %>% 
+  summarise(total_dollars = sum(amount)) %>% 
+  ungroup()
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+dem_inout_bycand
+
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+#### Charts
+```{r}
+
+#chart it out
+d <- ggplot(dem_inout, aes(in_out_state, total_dollars)) + geom_col(fill = "darkblue") + coord_flip() +
+  theme_minimal()
+
+#add extra elements to the chart and convert to ggplotly
+d2 <- d + labs(title = "Dems: In vs. Out of State",
+               # subtitle = "A subtitle",
+               caption = "Source: Bloomberg Analysis, FEC",
+               x ="", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous(labels=dollar) 
+
+d2
+
+
+
+
+
+```
+
+
+
+
+
+```{r}
+
+# The palette:
+cbPalette <- c("#999999","#448512")
+
+d <- ggplot(data = dem_inout_bycand, aes(x = ga_candidate, y = total_dollars, fill = in_out_state)) +
+  geom_col(position = "dodge") + coord_flip() + theme_minimal()
+
+d2 <- d + labs(title="Dems Candidates: In vs. Out of State",
+               # subtitle = "A subtitle",
+               caption = "Source: Source: Bloomberg Analysis, FEC",
+               x ="", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous(labels=dollar) +
+  scale_fill_manual(values=cbPalette) 
+  theme(legend.title=element_blank())
+
+d2
+
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
