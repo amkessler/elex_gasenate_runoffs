@@ -35,19 +35,26 @@ actblue_contribs_ga_sencands <- actblue_contribs %>%
   select(ga_party, ga_candidate, everything())
 
 
-#use perdue loeffler variations to filter winred
+#do the same for perdue loeffler variations from winred
 winred_contribs_ga_sencands <- winred_contribs %>% 
   filter(
     str_detect(memo_text, "PERDUE FOR SENATE") |
       str_detect(memo_text, "PERDUE VICTORY INC") |
       str_detect(memo_text, "FRIENDS OF DAVID PERDUE") |
       str_detect(memo_text, "GEORGIANS FOR KELLY LOEFFLER")
-  )
+  ) %>% 
+  mutate(
+    ga_candidate = case_when(
+      str_detect(memo_text, "PERDUE FOR SENATE") ~ "PERDUE",
+      str_detect(memo_text, "PERDUE VICTORY INC") ~ "PERDUE",
+      str_detect(memo_text, "FRIENDS OF DAVID PERDUE") ~ "PERDUE",
+      str_detect(memo_text, "GEORGIANS FOR KELLY LOEFFLER") ~ "LOEFFLER"
+    ),
+    ga_party = case_when(
+      ga_candidate == "PERDUE" ~ "R",
+      ga_candidate == "LOEFFLER" ~ "R"
+    )
+  ) %>% 
+  select(ga_party, ga_candidate, everything())
 
 
-
-glimpse(winred_contribs_all)
-
-winred_contribs_all %>% 
-  count(memo_text) %>% 
-  filter(str_detect(memo_text, "LOEFFLER"))
