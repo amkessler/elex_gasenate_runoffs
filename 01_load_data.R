@@ -58,3 +58,88 @@ actblue_expends_selectdates <- actblue_expends_all %>%
 
 #save for next steps
 saveRDS(actblue_expends_selectdates, "processed_data/actblue_expends_selectdates.rds")
+
+
+
+
+# WINRED FILINGS ####
+
+# *contribs*
+
+#import zipped file 
+winred_contribs_all <- read_csv("raw_data/winred_oct_quarterly_sa1448756.csv.zip", col_types = cols(.default = "c"))
+
+#format columns and add name column
+winred_contribs_all <- winred_contribs_all %>% 
+  mutate(
+    amount = as.numeric(amount),
+    aggregate_amount = as.numeric(aggregate_amount),
+    date = ymd(date),
+    cmte_name = "WINRED"
+  ) %>% 
+  select(cmte_name, everything())
+
+glimpse(winred_contribs_all)
+
+#filter for only records after our specified date
+winred_contribs_selectdates <- winred_contribs_all %>% 
+  filter(date > chosen_date)
+
+#save for next steps
+saveRDS(winred_contribs_selectdates, "processed_data/winred_contribs_selectdates.rds")
+
+
+# *expenditures*
+
+#import zipped file 
+winred_expends_all <- read_csv("raw_data/winred_oct_quarterly_sb1448756.csv.zip", col_types = cols(.default = "c"))
+
+#format columns and add name column
+winred_expends_all <- winred_expends_all %>% 
+  mutate(
+    amount = as.numeric(amount),
+    aggregate_amount = as.numeric(aggregate_amount),
+    date = ymd(date),
+    cmte_name = "WINRED"
+  ) %>% 
+  select(cmte_name, everything())
+
+glimpse(winred_expends_all)
+
+#filter for only records after our specified date
+winred_expends_selectdates <- winred_expends_all %>% 
+  filter(date > chosen_date)
+
+#save for next steps
+saveRDS(winred_expends_selectdates, "processed_data/winred_expends_selectdates.rds")
+
+
+
+
+
+
+# SENATE LEADERSHIP FUND FILINGS ####
+
+# *contribs*
+
+#import zipped file 
+senateleadershipfund_contribs_all <- read_csv("raw_data/senateleadershipfund_oct_monthly_sa.csv", col_types = cols(.default = "c"))
+
+#format columns and add name column
+senateleadershipfund_contribs_all <- senateleadershipfund_contribs_all %>% 
+  mutate(
+    amount = as.numeric(amount),
+    aggregate_amount = as.numeric(aggregate_amount),
+    date = ymd(date),
+    cmte_name = "SENATE LEADERSHIP FUND"
+  ) %>% 
+  select(cmte_name, everything())
+
+glimpse(senateleadershipfund_contribs_all)
+
+#filter for only records after our specified date
+senateleadershipfund_contribs_selectdates <- senateleadershipfund_contribs_all %>% 
+  filter(date > chosen_date)
+
+#save for next steps
+saveRDS(senateleadershipfund_contribs_selectdates, "processed_data/senateleadershipfund_contribs_selectdates.rds")
