@@ -22,6 +22,7 @@ library(widgetframe)
 library(scales)
 library(zoo)
 library(summarytools)
+library(writexl)
 options(dplyr.summarise.inform = FALSE)
 ```
 
@@ -268,6 +269,9 @@ d2
 
 
 ```{r}
+
+# Prepare data
+
 topzips_gop <- winred_contribs %>% 
   mutate(
     zip5 = str_sub(contributor_zip_code, 1, 5)
@@ -293,17 +297,6 @@ topzips_dem
 write_csv(topzips_gop, "output/topzips_gop_winred.csv")
 write_csv(topzips_dem, "output/topzips_dem_actblue.csv")
 
-```
-
-
-```{r}
-glimpse(winred_contribs)
-
-
-#write to file
-write_csv(topzips_gop, "topzips_gop.csv")
-write_csv(topzips_dem, "topzips_dem.csv")
-
 
 ### compare D and R in each zip ####
 
@@ -326,10 +319,10 @@ zipcompare <- zipcompare %>%
 
 
 ### bring in the zipcode data table for adding names to zips 
-zip_codes_lookup <- read_csv("zip-codes-database-STANDARD.csv")
+zip_codes_lookup <- read_csv("zip_data/zip-codes-database-STANDARD.csv")
 
 zip_codes_lookup <- zip_codes_lookup %>% 
-  clean_names
+  clean_names()
 
 zip_codes_lookup <- zip_codes_lookup %>% 
   mutate(
@@ -348,12 +341,15 @@ zip_codes_lookup <- zip_codes_lookup %>%
 zipcompare <- left_join(zipcompare, zip_codes_lookup)
 
 #save table as rds for later use
-saveRDS(zipcompare, "zipcompare.rds")
+saveRDS(zipcompare, "output/zipcompare.rds")
 # save as excel for sharing
-writexl::write_xlsx(zipcompare, "output/zipcompare.xlsx")
+write_xlsx(zipcompare, "output/zipcompare.xlsx")
 
 
 ```
+
+
+
 
 
 ```{r}
