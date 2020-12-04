@@ -46,6 +46,12 @@ actblue_fecraw_contribs_postelex_GASEN <- actblue_fecraw_contribs_postelex %>%
       str_detect(memo_text_description, "WARNOCK VICTORY FUND")
   ) %>% 
   mutate(
+    ga_committee = case_when(
+      str_detect(memo_text_description, "JON OSSOFF FOR SENATE") ~ "JON OSSOFF FOR SENATE",
+      str_detect(memo_text_description, "OSSOFF VICTORY FUND") ~ "OSSOFF VICTORY FUND",
+      str_detect(memo_text_description, "WARNOCK FOR GEORGIA") ~ "WARNOCK FOR GEORGIA",
+      str_detect(memo_text_description, "WARNOCK VICTORY FUND") ~ "WARNOCK VICTORY FUND"
+    ),    
     ga_candidate = case_when(
       str_detect(memo_text_description, "JON OSSOFF FOR SENATE") ~ "OSSOFF",
       str_detect(memo_text_description, "OSSOFF VICTORY FUND") ~ "OSSOFF",
