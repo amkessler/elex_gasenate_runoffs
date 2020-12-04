@@ -62,7 +62,7 @@ Actblue
 
 actblue_contribs %>% 
   group_by(ga_candidate) %>% 
-  summarise(total_dollars = sum(contribution_amount)) 
+  summarise(total_dollars = sum(contribution_amount), avg_amount = mean(contribution_amount), median_amount = median(contribution_amount)) 
 
 ```
 
@@ -70,7 +70,7 @@ WinRed
 ```{r}
 winred_contribs %>% 
   group_by(ga_candidate) %>% 
-  summarise(total_dollars = sum(contribution_amount)) 
+  summarise(total_dollars = sum(contribution_amount), avg_amount = mean(contribution_amount), median_amount = median(contribution_amount)) 
 
 ```
 
