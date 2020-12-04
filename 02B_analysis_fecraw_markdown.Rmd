@@ -21,20 +21,58 @@ library(plotly)
 library(widgetframe)
 library(scales)
 library(zoo)
+library(summarytools)
 options(dplyr.summarise.inform = FALSE)
+```
 
+
+```{r dataload, include=FALSE, cache=TRUE}
 #load data files created in step 01
 actblue_contribs <- readRDS("processed_data/actblue_fecraw_contribs_postelex_GASEN.rds")
-# winred_contribs_ga_sencands <- readRDS("output/winred_contribs_ga_sencands.rds")
+winred_contribs <- readRDS("processed_data/winred_fecraw_contribs_postelex_GASEN.rds")
+
+
+#ensure that nothing slipped through during processing and we're just looking at 
+#individual earmarked contributions
+actblue_contribs <- actblue_contribs %>% 
+  filter(
+    entity_type == "IND", # only individual contributions
+    is.na(memo_code), # remove memo lines
+    contribution_purpose_descrip == "Earmark" # remove donations that are not for a specific candidate
+  )
+
+winred_contribs <- winred_contribs %>% 
+  filter(
+    entity_type == "IND", # only individual contributions
+    is.na(memo_code), # remove memo lines
+  )
+
+
 
 
 ```
 
+
+
 ## Totals
 
-asdfasfdasdf
-aasdfasfsadf  
-asfdasfsd
+Actblue
+
+```{r}
+
+actblue_contribs %>% 
+  group_by(ga_candidate) %>% 
+  summarise(total_dollars = sum(contribution_amount)) 
+
+```
+
+WinRed
+```{r}
+winred_contribs %>% 
+  group_by(ga_candidate) %>% 
+  summarise(total_dollars = sum(contribution_amount)) 
+
+```
 
 ###
 ## In-State vs. Out-of-State
@@ -43,20 +81,34 @@ asfdasfsd
 **Dem overall totals**
 ```{r}
 
-dem_inout <- actblue_contribs_ga_sencands %>% 
+dem_inout <- actblue_contribs %>% 
   group_by(in_out_state) %>% 
-  summarise(total_dollars = sum(amount)) %>% 
+  summarise(total_dollars = sum(contribution_amount)) %>% 
   ungroup()
 
 dem_inout
 ```
 
+**Dem totals by top states**
+```{r}
+
+dem_bystate <- actblue_contribs %>% 
+  group_by(contributor_state) %>% 
+  summarise(total_dollars = sum(contribution_amount)) %>% 
+  arrange(desc(total_dollars)) %>% 
+  ungroup() %>% 
+  head(15)
+
+dem_bystate
+```
+
+
 **Dem candidate totals**
 ```{r}
 
-dem_inout_bycand <- actblue_contribs_ga_sencands %>% 
+dem_inout_bycand <- actblue_contribs %>% 
   group_by(ga_candidate, in_out_state) %>% 
-  summarise(total_dollars = sum(amount)) %>% 
+  summarise(total_dollars = sum(contribution_amount)) %>% 
   ungroup()
 
 dem_inout_bycand
@@ -118,54 +170,69 @@ d2
 ```
 
 
-<!-- **GOP overall totals** -->
-<!-- ```{r} -->
+**GOP overall totals**
+```{r}
 
-<!-- gop_inout <- winred_contribs_ga_sencands %>%  -->
-<!--   group_by(in_out_state) %>%  -->
-<!--   summarise(total_dollars = sum(amount)) %>%  -->
-<!--   ungroup() -->
+gop_inout <- winred_contribs %>%
+  group_by(in_out_state) %>%
+  summarise(total_dollars = sum(contribution_amount)) %>%
+  ungroup()
 
-<!-- gop_inout -->
-<!-- ``` -->
+gop_inout
+```
 
-<!-- **GOP candidate totals** -->
-<!-- ```{r} -->
+**GOP totals by top states**
+```{r}
 
-<!-- gop_inout_bycand <- winred_contribs_ga_sencands %>%  -->
-<!--   group_by(ga_candidate, in_out_state) %>%  -->
-<!--   summarise(total_dollars = sum(amount)) %>%  -->
-<!--   ungroup() -->
+gop_bystate <- winred_contribs %>% 
+  group_by(contributor_state) %>% 
+  summarise(total_dollars = sum(contribution_amount)) %>% 
+  arrange(desc(total_dollars)) %>% 
+  ungroup() %>% 
+  head(15)
 
-<!-- gop_inout_bycand -->
-
-
-<!-- ``` -->
-
-
-<!-- ```{r} -->
-
-<!-- #chart it out -->
-<!-- d <- ggplot(gop_inout, aes(in_out_state, total_dollars)) + geom_col(fill = "darkred") + coord_flip() + -->
-<!--   theme_minimal() -->
-
-<!-- #add extra elements to the chart and convert to ggplotly -->
-<!-- d2 <- d + labs(title = "Republicans: In vs. Out of State", -->
-<!--                subtitle = "(Since Nov. 4th)", -->
-<!--                caption = "Source: Bloomberg Analysis, FEC", -->
-<!--                x ="", y = "") + -->
-<!--   theme(plot.title = element_text(hjust = 0.5)) + -->
-<!--   theme(plot.subtitle = element_text(hjust = 0.5)) + -->
-<!--   theme(axis.text.x = element_text(angle = 45, hjust = 1)) + -->
-<!--   scale_y_continuous(labels=dollar)  -->
-
-<!-- d2 -->
+gop_bystate
+```
 
 
 
+**GOP candidate totals**
+```{r}
+
+gop_inout_bycand <- winred_contribs %>%
+  group_by(ga_candidate, in_out_state) %>%
+  summarise(total_dollars = sum(contribution_amount)) %>%
+  ungroup()
+
+gop_inout_bycand
 
 
-<!-- ``` -->
+```
+
+
+```{r}
+
+#chart it out
+d <- ggplot(gop_inout, aes(in_out_state, total_dollars)) + geom_col(fill = "darkred") + coord_flip() +
+  theme_minimal()
+
+#add extra elements to the chart and convert to ggplotly
+d2 <- d + labs(title = "Republicans: In vs. Out of State",
+               subtitle = "(Since Nov. 4th)",
+               caption = "Source: Bloomberg Analysis, FEC",
+               x ="", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(plot.subtitle = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous(labels=dollar)
+
+d2
+
+
+
+
+
+```
 
 
 
