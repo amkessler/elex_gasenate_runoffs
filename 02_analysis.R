@@ -121,7 +121,44 @@ saveRDS(dd_nomenu, "demtopzip_plt_nm.rds")
 
 
 
+### Some work space for separate bits of code #### -------------------------------
+
+actblue_contribs %>% 
+  group_by(ga_candidate) %>% 
+  summarise(total_dollars = sum(contribution_amount)) %>% 
+  ungroup()
 
 
+winred_fecraw_contribs_postelex_GASEN %>% 
+  group_by(ga_candidate) %>% 
+  summarise(total_dollars = sum(contribution_amount)) %>% 
+  ungroup()
 
 
+glimpse(actblue_contribs)
+
+actblue_contribs %>% 
+  head(1000) %>% 
+  mutate(
+    lineitem = str_split(transaction_id, "_")[1]
+  ) %>% 
+  glimpse()
+  
+
+z<- actblue_contribs %>% 
+  select(ga_candidate, contribution_amount)
+  
+view(dfSummary(z))
+  
+actblue_contribs %>% 
+  mutate(
+    amount_rounded = round_half_up(contribution_amount)
+  ) %>% 
+  count(amount_rounded) %>% writexl::write_xlsx("output/actblue_roundedcontribamounts.xlsx")
+
+
+actblue_contribs %>% 
+  filter(
+    contribution_amount >= 10000
+  ) %>% 
+  View()
