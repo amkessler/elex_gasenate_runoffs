@@ -4,7 +4,7 @@ library(janitor)
 
 
 #for filtering by selected date below, choose your date here
-chosen_date <- "2020-09-27"
+chosen_date <- "2020-11-03"
 
 
 
@@ -193,64 +193,107 @@ write_csv(winred_contribs_ga_sencands, "output/winred_contribs_ga_sencands.csv")
 
 
 
+# SENATE LEADERSHIP FUND FILINGS ####
+
+# *contribs*
+
+#import zipped file
+senateleadershipfund_contribs_all <- read_csv("raw_data/itemizerfiles/senateleadershipfund_sa.csv", col_types = cols(.default = "c"))
+
+#format columns and add name column
+senateleadershipfund_contribs_all <- senateleadershipfund_contribs_all %>%
+  mutate(
+    amount = as.numeric(amount),
+    aggregate_amount = as.numeric(aggregate_amount),
+    date = ymd(date),
+    cmte_name = "SENATE LEADERSHIP FUND"
+  ) %>%
+  select(cmte_name, everything())
+
+glimpse(senateleadershipfund_contribs_all)
+
+#filter for only records after our specified date
+senateleadershipfund_contribs_selectdates <- senateleadershipfund_contribs_all %>%
+  filter(date > chosen_date)
+
+#save for next steps
+saveRDS(senateleadershipfund_contribs_selectdates, "processed_data/senateleadershipfund_contribs_selectdates.rds")
 
 
+# *expenditures*
 
+#import zipped file
+senateleadershipfund_expends_all <- read_csv("raw_data/itemizerfiles/senateleadershipfund_sb.csv", col_types = cols(.default = "c"))
 
+#format columns and add name column
+senateleadershipfund_expends_all <- senateleadershipfund_expends_all %>%
+  mutate(
+    amount = as.numeric(amount),
+    date = ymd(date),
+    cmte_name = "SENATE LEADERSHIP FUND"
+  ) %>%
+  select(cmte_name, everything())
 
+glimpse(senateleadershipfund_expends_all)
 
+#filter for only records after our specified date
+senateleadershipfund_expends_selectdates <- senateleadershipfund_expends_all %>%
+  filter(date > chosen_date)
 
+#save for next steps
+saveRDS(senateleadershipfund_expends_selectdates, "processed_data/senateleadershipfund_expends_selectdates.rds")
 
 
 
 # 
-# # SENATE LEADERSHIP FUND FILINGS ####
+# # SMP (SEN. MAJORITY PAC) FILINGS ####
 # 
 # # *contribs*
 # 
-# #import zipped file 
-# senateleadershipfund_contribs_all <- read_csv("raw_data/senateleadershipfund_oct_monthly_sa.csv", col_types = cols(.default = "c"))
+# #import zipped file
+# smp_contribs_all <- read_csv("raw_data/itemizerfiles/smp_sa.csv", col_types = cols(.default = "c"))
 # 
 # #format columns and add name column
-# senateleadershipfund_contribs_all <- senateleadershipfund_contribs_all %>% 
+# smp_contribs_all <- smp_contribs_all %>%
 #   mutate(
 #     amount = as.numeric(amount),
 #     aggregate_amount = as.numeric(aggregate_amount),
 #     date = ymd(date),
-#     cmte_name = "SENATE LEADERSHIP FUND"
-#   ) %>% 
+#     cmte_name = "SMP"
+#   ) %>%
 #   select(cmte_name, everything())
 # 
-# glimpse(senateleadershipfund_contribs_all)
+# glimpse(smp_contribs_all)
 # 
 # #filter for only records after our specified date
-# senateleadershipfund_contribs_selectdates <- senateleadershipfund_contribs_all %>% 
+# smp_contribs_selectdates <- smp_contribs_all %>%
 #   filter(date > chosen_date)
 # 
 # #save for next steps
-# saveRDS(senateleadershipfund_contribs_selectdates, "processed_data/senateleadershipfund_contribs_selectdates.rds")
+# saveRDS(smp_contribs_selectdates, "processed_data/smp_contribs_selectdates.rds")
 # 
 # 
 # # *expenditures*
 # 
-# #import zipped file 
-# senateleadershipfund_expends_all <- read_csv("raw_data/senateleadershipfund_oct_monthly_sb.csv", col_types = cols(.default = "c"))
+# #import zipped file
+# smp_expends_all <- read_csv("raw_data/itemizerfiles/smp_sb.csv", col_types = cols(.default = "c"))
 # 
 # #format columns and add name column
-# senateleadershipfund_expends_all <- senateleadershipfund_expends_all %>% 
+# smp_expends_all <- smp_expends_all %>%
 #   mutate(
 #     amount = as.numeric(amount),
 #     date = ymd(date),
-#     cmte_name = "SENATE LEADERSHIP FUND"
-#   ) %>% 
+#     cmte_name = "SMP"
+#   ) %>%
 #   select(cmte_name, everything())
 # 
-# glimpse(senateleadershipfund_expends_all)
+# glimpse(smp_expends_all)
 # 
 # #filter for only records after our specified date
-# senateleadershipfund_expends_selectdates <- senateleadershipfund_expends_all %>% 
+# smp_expends_selectdates <- smp_expends_all %>%
 #   filter(date > chosen_date)
 # 
 # #save for next steps
-# saveRDS(senateleadershipfund_expends_selectdates, "processed_data/senateleadershipfund_expends_selectdates.rds")
+# saveRDS(smp_expends_selectdates, "processed_data/smp_expends_selectdates.rds")
 # 
+# smp_contribs_selectdates 
