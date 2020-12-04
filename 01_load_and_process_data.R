@@ -6,6 +6,67 @@ library(janitor)
 #for filtering by selected date below, choose your date here
 chosen_date <- "2020-11-03"
 
+#from raw fec reports
+actblue_fecraw_contribs_all <- read_csv("raw_data/fecfiles/actblue_1481637-schedule-a.csv", col_types = cols(.default = "c"))
+
+actblue_fecraw_contribs_all <- actblue_fecraw_contribs_all %>% 
+  mutate(
+    contribution_date = ymd(contribution_date),
+    contribution_amount = as.numeric(contribution_amount),
+    contribution_aggregate = as.numeric(contribution_aggregate),
+    cmte_name = "ACTBLUE"
+  ) %>% 
+  select(cmte_name, everything())
+
+
+glimpse(actblue_fecraw_contribs_all)
+
+#filter for only records after our specified date
+actblue_fecraw_contribs_postelex <- actblue_fecraw_contribs_all %>% 
+  filter(contribution_date > chosen_date)
+
+
+#save versions 
+saveRDS(actblue_fecraw_contribs_all, "processed_data/actblue_fecraw_contribs_all.rds")
+saveRDS(actblue_fecraw_contribs_postelex, "processed_data/actblue_fecraw_contribs_postelex.rds")
+
+actblue_fecraw_contribs_postelex_GASEN %>% 
+  head(1000) %>% 
+  View()
+
+
+
+#use ossoff and warnock variations to filter actblue
+#and create new columns to standardize
+actblue_fecraw_contribs_postelex_GASEN <- actblue_fecraw_contribs_postelex %>% 
+  filter(
+    str_detect(memo_text_description, "JON OSSOFF FOR SENATE") |
+      str_detect(memo_text_description, "OSSOFF VICTORY FUND") |
+      str_detect(memo_text_description, "WARNOCK FOR GEORGIA") |
+      str_detect(memo_text_description, "WARNOCK VICTORY FUND")
+  ) %>% 
+  mutate(
+    ga_candidate = case_when(
+      str_detect(memo_text_description, "JON OSSOFF FOR SENATE") ~ "OSSOFF",
+      str_detect(memo_text_description, "OSSOFF VICTORY FUND") ~ "OSSOFF",
+      str_detect(memo_text_description, "WARNOCK FOR GEORGIA") ~ "WARNOCK",
+      str_detect(memo_text_description, "WARNOCK VICTORY FUND") ~ "WARNOCK"
+    ),
+    ga_party = case_when(
+      ga_candidate == "OSSOFF" ~ "D",
+      ga_candidate == "WARNOCK" ~ "D"
+    ),
+    in_out_state = if_else(contributor_state == "GA", "IN", "OUT")
+  ) %>% 
+  select(ga_party, ga_candidate, everything())
+
+#save for next steps
+saveRDS(actblue_fecraw_contribs_postelex_GASEN, "output/actblue_fecraw_contribs_postelex_GASEN.rds")
+#save for sharing with others
+write_csv(actblue_fecraw_contribs_postelex_GASEN, "output/actblue_fecraw_contribs_postelex_GASEN.csv")
+
+
+
 
 
 # ACTBLUE FILINGS ####
