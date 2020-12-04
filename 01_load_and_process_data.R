@@ -6,7 +6,7 @@ library(janitor)
 #for filtering by selected date below, choose your date here
 chosen_date <- "2020-11-03"
 
-#from raw fec reports
+#acblue from raw fec reports ####
 actblue_fecraw_contribs_all <- read_csv("raw_data/fecfiles/actblue_1481637-schedule-a.csv", col_types = cols(.default = "c"))
 
 actblue_fecraw_contribs_all <- actblue_fecraw_contribs_all %>% 
@@ -25,7 +25,6 @@ glimpse(actblue_fecraw_contribs_all)
 actblue_fecraw_contribs_postelex <- actblue_fecraw_contribs_all %>% 
   filter(contribution_date > chosen_date)
 
-
 #save versions 
 saveRDS(actblue_fecraw_contribs_all, "processed_data/actblue_fecraw_contribs_all.rds")
 saveRDS(actblue_fecraw_contribs_postelex, "processed_data/actblue_fecraw_contribs_postelex.rds")
@@ -35,8 +34,7 @@ actblue_fecraw_contribs_postelex_GASEN %>%
   View()
 
 
-
-#use ossoff and warnock variations to filter actblue
+#use ossoff and warnock variations to filter actblue ####
 #and create new columns to standardize
 actblue_fecraw_contribs_postelex_GASEN <- actblue_fecraw_contribs_postelex %>% 
   filter(
@@ -73,6 +71,87 @@ write_csv(actblue_fecraw_contribs_postelex_GASEN, "processed_data/actblue_fecraw
 
 
 
+#### Winred from fec raw ####
+
+#from raw fec reports
+winred_fecraw_contribs_all <- read_csv("raw_data/fecfiles/winred_1481581-schedule-a.csv", col_types = cols(.default = "c"))
+
+winred_fecraw_contribs_all <- winred_fecraw_contribs_all %>% 
+  mutate(
+    contribution_date = ymd(contribution_date),
+    contribution_amount = as.numeric(contribution_amount),
+    contribution_aggregate = as.numeric(contribution_aggregate),
+    cmte_name = "WINRED"
+  ) %>% 
+  select(cmte_name, everything())
+
+
+glimpse(winred_fecraw_contribs_all)
+
+#filter for only records after our specified date
+winred_fecraw_contribs_postelex <- winred_fecraw_contribs_all %>% 
+  filter(contribution_date > chosen_date)
+
+#save versions 
+saveRDS(winred_fecraw_contribs_all, "processed_data/winred_fecraw_contribs_all.rds")
+saveRDS(winred_fecraw_contribs_postelex, "processed_data/winred_fecraw_contribs_postelex.rds")
+
+winred_fecraw_contribs_postelex %>%
+  head(1000) %>%
+  View()
+
+winred_fecraw_contribs_postelex %>% 
+  count(committee)
+
+
+#use ossoff and warnock variations to filter winred ####
+#and create new columns to standardize
+winred_fecraw_contribs_postelex_GASEN <- winred_fecraw_contribs_postelex %>% 
+  filter(
+    str_detect(contribution_purpose_descrip, "PERDUE FOR SENATE") |
+      str_detect(contribution_purpose_descrip, "PERDUE VICTORY INC") |
+      str_detect(contribution_purpose_descrip, "FRIENDS OF DAVID PERDUE") |
+      str_detect(contribution_purpose_descrip, "GEORGIANS FOR KELLY LOEFFLER")
+  ) %>% 
+  mutate(
+    ga_committee = case_when(
+      str_detect(contribution_purpose_descrip, "PERDUE FOR SENATE") ~ "PERDUE FOR SENATE",
+      str_detect(contribution_purpose_descrip, "PERDUE VICTORY INC") ~ "PERDUE VICTORY INC",
+      str_detect(contribution_purpose_descrip, "FRIENDS OF DAVID PERDUE") ~ "FRIENDS OF DAVID PERDUE",
+      str_detect(contribution_purpose_descrip, "GEORGIANS FOR KELLY LOEFFLER") ~ "GEORGIANS FOR KELLY LOEFFLER"
+    ),    
+    ga_candidate = case_when(
+      str_detect(contribution_purpose_descrip, "PERDUE FOR SENATE") ~ "PERDUE",
+      str_detect(contribution_purpose_descrip, "PERDUE VICTORY INC") ~ "PERDUE",
+      str_detect(contribution_purpose_descrip, "FRIENDS OF DAVID PERDUE") ~ "PERDUE",
+      str_detect(contribution_purpose_descrip, "GEORGIANS FOR KELLY LOEFFLER") ~ "LOEFFLER"
+    ),
+    ga_party = case_when(
+      ga_candidate == "PERDUE" ~ "R",
+      ga_candidate == "LOEFFLER" ~ "R"
+    ),
+    in_out_state = if_else(contributor_state == "GA", "IN", "OUT")
+  ) %>% 
+  select(ga_party, ga_candidate, everything())
+  
+glimpse(winred_fecraw_contribs_postelex_GASEN)  
+
+#save for next steps
+saveRDS(winred_fecraw_contribs_postelex_GASEN, "processed_data/winred_fecraw_contribs_postelex_GASEN.rds")
+#save for sharing with others
+write_csv(winred_fecraw_contribs_postelex_GASEN, "processed_data/winred_fecraw_contribs_postelex_GASEN.csv")
+
+
+
+
+
+
+
+
+
+
+
+#### ---------
 
 
 # ACTBLUE FILINGS ####
