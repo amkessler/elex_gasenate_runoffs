@@ -162,3 +162,61 @@ actblue_contribs %>%
     contribution_amount >= 10000
   ) %>% 
   View()
+
+
+#for charts
+winred_contribs %>% 
+  group_by(contributor_state) %>% 
+  summarise(total_dollars = sum(contribution_amount)) %>% 
+  arrange(desc(total_dollars)) %>% 
+  write_csv("output/winred_bystate.csv")
+
+actblue_contribs %>% 
+  group_by(contributor_state) %>% 
+  summarise(total_dollars = sum(contribution_amount)) %>% 
+  arrange(desc(total_dollars)) %>% 
+  write_csv("output/actblue_bystate.csv")
+
+
+
+gop_inout <- winred_contribs %>%
+  group_by(in_out_state) %>%
+  summarise(total_dollars = sum(contribution_amount)) %>%
+  ungroup() %>% 
+  mutate(
+    party = "Republicans"
+  )
+
+gop_inout
+
+dem_inout <- actblue_contribs %>%
+  group_by(in_out_state) %>%
+  summarise(total_dollars = sum(contribution_amount)) %>%
+  ungroup() %>% 
+  mutate(
+    party = "Democrats"
+  )
+
+dem_inout
+
+inout_combined <- bind_rows(dem_inout, gop_inout)
+
+inout_combined <- inout_combined %>% 
+  pivot_wider(names_from = party, values_from = total_dollars)
+
+inout_combined %>% write_csv("output/inout_combined.csv")
+
+
+
+z <- actblue_contribs %>% 
+  group_by(ga_candidate) %>% 
+  summarise(total_dollars = sum(contribution_amount), avg_contribution = mean(contribution_amount)) %>% 
+  mutate(ga_candidate = paste0("D-", ga_candidate)) 
+
+z1 <- winred_contribs %>% 
+  group_by(ga_candidate) %>% 
+  summarise(total_dollars = sum(contribution_amount), avg_contribution = mean(contribution_amount)) %>% 
+  mutate(ga_candidate = paste0("R-", ga_candidate))
+
+totals_bycand <- bind_rows(z, z1)
+totals_bycand %>% write_csv("output/totals_bycand.csv")
