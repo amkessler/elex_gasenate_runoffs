@@ -95,7 +95,7 @@ d2
 ```{r}
 
 # The palette:
-cbPalette <- c("#999999","#448512")
+cbPalette <- c("#508104","#db8200")
 
 d <- ggplot(data = dem_inout_bycand, aes(x = ga_candidate, y = total_dollars, fill = in_out_state)) +
   geom_col(position = "dodge") + coord_flip() + theme_minimal()
@@ -107,7 +107,7 @@ d2 <- d + labs(title="Dems Candidates: In vs. Out of State",
   theme(plot.title = element_text(hjust = 0.5)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_y_continuous(labels=dollar) +
-  scale_fill_manual(values=cbPalette) 
+  scale_fill_manual(values=cbPalette) +
   theme(legend.title=element_blank())
 
 d2
