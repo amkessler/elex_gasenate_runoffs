@@ -61,9 +61,9 @@ actblue_fecraw_contribs_postelex_GASEN <- actblue_fecraw_contribs_postelex %>%
   select(ga_party, ga_candidate, everything())
 
 #save for next steps
-saveRDS(actblue_fecraw_contribs_postelex_GASEN, "output/actblue_fecraw_contribs_postelex_GASEN.rds")
+saveRDS(actblue_fecraw_contribs_postelex_GASEN, "processed_data/actblue_fecraw_contribs_postelex_GASEN.rds")
 #save for sharing with others
-write_csv(actblue_fecraw_contribs_postelex_GASEN, "output/actblue_fecraw_contribs_postelex_GASEN.csv")
+write_csv(actblue_fecraw_contribs_postelex_GASEN, "processed_data/actblue_fecraw_contribs_postelex_GASEN.csv")
 
 
 
