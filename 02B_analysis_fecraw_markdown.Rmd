@@ -264,9 +264,93 @@ d2
 ```
 
 
+## Zip Codes
 
 
 ```{r}
+topzips_gop <- winred_contribs %>% 
+  mutate(
+    zip5 = str_sub(contributor_zip_code, 1, 5)
+  ) %>% 
+  group_by(zip5) %>% 
+  summarise(sumtotal = sum(contribution_amount)) %>% 
+  arrange(desc(sumtotal))
+
+topzips_gop
+
+
+topzips_dem <- actblue_contribs %>% 
+  mutate(
+    zip5 = str_sub(contributor_zip_code, 1, 5)
+  ) %>% 
+  group_by(zip5) %>% 
+  summarise(sumtotal = sum(contribution_amount)) %>% 
+  arrange(desc(sumtotal))
+
+topzips_dem
+
+#write to file
+write_csv(topzips_gop, "output/topzips_gop_winred.csv")
+write_csv(topzips_dem, "output/topzips_dem_actblue.csv")
+
+```
+
+
+```{r}
+glimpse(winred_contribs)
+
+
+#write to file
+write_csv(topzips_gop, "topzips_gop.csv")
+write_csv(topzips_dem, "topzips_dem.csv")
+
+
+### compare D and R in each zip ####
+
+colnames(topzips_dem) <- c("zip_code", "demtotal")
+colnames(topzips_gop) <- c("zip_code", "goptotal")
+
+#join
+zipcompare <- full_join(topzips_dem, topzips_gop)
+
+#change nas to 0
+zipcompare <- zipcompare %>% 
+  replace(., is.na(.), 0)
+
+#party with more
+zipcompare <- zipcompare %>% 
+  mutate(
+    winner = ifelse(demtotal>goptotal, "D", "R"),
+    advantage = abs(demtotal-goptotal)  
+  )
+
+
+### bring in the zipcode data table for adding names to zips 
+zip_codes_lookup <- read_csv("zip-codes-database-STANDARD.csv")
+
+zip_codes_lookup <- zip_codes_lookup %>% 
+  clean_names
+
+zip_codes_lookup <- zip_codes_lookup %>% 
+  mutate(
+    city = str_to_title(city),
+    name = paste0(city, ", ", state),
+    zipname = paste0(zip_code, " (", name, ")")
+  ) %>% 
+  select(zip_code, city, state, zipname)
+
+#remove dups
+zip_codes_lookup <- zip_codes_lookup %>% 
+  distinct(zip_code, city, state, zipname)
+
+
+#join to our table
+zipcompare <- left_join(zipcompare, zip_codes_lookup)
+
+#save table as rds for later use
+saveRDS(zipcompare, "zipcompare.rds")
+# save as excel for sharing
+writexl::write_xlsx(zipcompare, "output/zipcompare.xlsx")
 
 
 ```
