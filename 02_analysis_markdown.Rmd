@@ -64,7 +64,6 @@ dem_inout_bycand
 
 ```
 
-#### Charts
 ```{r}
 
 #chart it out
@@ -73,10 +72,11 @@ d <- ggplot(dem_inout, aes(in_out_state, total_dollars)) + geom_col(fill = "dark
 
 #add extra elements to the chart and convert to ggplotly
 d2 <- d + labs(title = "Dems: In vs. Out of State",
-               # subtitle = "A subtitle",
+               subtitle = "(Since Nov. 4th)",
                caption = "Source: Bloomberg Analysis, FEC",
                x ="", y = "") +
   theme(plot.title = element_text(hjust = 0.5)) +
+  theme(plot.subtitle = element_text(hjust = 0.5)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_y_continuous(labels=dollar) 
 
@@ -101,10 +101,11 @@ d <- ggplot(data = dem_inout_bycand, aes(x = ga_candidate, y = total_dollars, fi
   geom_col(position = "dodge") + coord_flip() + theme_minimal()
 
 d2 <- d + labs(title="Dems Candidates: In vs. Out of State",
-               # subtitle = "A subtitle",
+               subtitle = "(Since Nov. 4th)",
                caption = "Source: Source: Bloomberg Analysis, FEC",
                x ="", y = "") +
   theme(plot.title = element_text(hjust = 0.5)) +
+  theme(plot.subtitle = element_text(hjust = 0.5)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_y_continuous(labels=dollar) +
   scale_fill_manual(values=cbPalette) +
@@ -115,6 +116,87 @@ d2
 
 
 ```
+
+
+**GOP overall totals**
+```{r}
+
+gop_inout <- winred_contribs_ga_sencands %>% 
+  group_by(in_out_state) %>% 
+  summarise(total_dollars = sum(amount)) %>% 
+  ungroup()
+
+gop_inout
+```
+
+**GOP candidate totals**
+```{r}
+
+gop_inout_bycand <- winred_contribs_ga_sencands %>% 
+  group_by(ga_candidate, in_out_state) %>% 
+  summarise(total_dollars = sum(amount)) %>% 
+  ungroup()
+
+gop_inout_bycand
+
+
+```
+
+
+```{r}
+
+#chart it out
+d <- ggplot(gop_inout, aes(in_out_state, total_dollars)) + geom_col(fill = "darkred") + coord_flip() +
+  theme_minimal()
+
+#add extra elements to the chart and convert to ggplotly
+d2 <- d + labs(title = "Republicans: In vs. Out of State",
+               subtitle = "(Since Nov. 4th)",
+               caption = "Source: Bloomberg Analysis, FEC",
+               x ="", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(plot.subtitle = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous(labels=dollar) 
+
+d2
+
+
+
+
+
+```
+
+
+
+
+
+```{r}
+
+# The palette:
+cbPalette <- c("#508104","#db8200")
+
+d <- ggplot(data = gop_inout_bycand, aes(x = ga_candidate, y = total_dollars, fill = in_out_state)) +
+  geom_col(position = "dodge") + coord_flip() + theme_minimal()
+
+d2 <- d + labs(title="Republican Candidates: In vs. Out of State",
+               subtitle = "(Since Nov. 4th)",
+               caption = "Source: Source: Bloomberg Analysis, FEC",
+               x ="", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(plot.subtitle = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous(labels=dollar) +
+  scale_fill_manual(values=cbPalette) +
+  theme(legend.title=element_blank())
+
+d2
+
+
+
+```
+
+
 
 
 ```{r}
