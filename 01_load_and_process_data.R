@@ -217,7 +217,7 @@ saveRDS(actblue_expends_all, "processed_data/actblue_expends_all.rds")
 # *contribs*
 
 #import zipped file 
-winred_contribs_all <- read_csv("raw_data/winred_oct_quarterly_sa1448756.csv.zip", col_types = cols(.default = "c"))
+winred_contribs_all <- read_csv("raw_data/itemizerfiles/winred_postgen_sa1481581.csv", col_types = cols(.default = "c"))
 
 #format columns and add name column
 winred_contribs_all <- winred_contribs_all %>% 
@@ -388,6 +388,57 @@ senateleadershipfund_expends_selectdates <- senateleadershipfund_expends_all %>%
 
 #save for next steps
 saveRDS(senateleadershipfund_expends_selectdates, "processed_data/senateleadershipfund_expends_selectdates.rds")
+
+
+
+
+
+### WINRED - TRUMP/RNC CONTRIBS ONLY ####
+
+#import zipped file 
+winred_item_contribs_all <- read_csv("raw_data/itemizerfiles/winred_postgen_sa1481581.csv", col_types = cols(.default = "c"))
+
+#format columns and add name column
+winred_item_contribs_all <- winred_item_contribs_all %>% 
+  mutate(
+    amount = as.numeric(amount),
+    aggregate_amount = as.numeric(aggregate_amount),
+    date = ymd(date),
+    cmte_name = "WINRED"
+  ) %>% 
+  select(cmte_name, everything())
+
+glimpse(winred_item_contribs_all)
+
+#save all records versions in case needed
+saveRDS(winred_item_contribs_all, "processed_data/winred_item_contribs_all.rds")
+
+#variations on Trump/RNC
+# DONALD J. TRUMP FOR PRESIDENT, INC.
+# TRUMP MAKE AMERICA GREAT AGAIN COMMITTEE
+# TRUMP VICTORY
+# REPUBLICAN NATIONAL COMMITTEE
+
+winred_itemcontribs_trump_rnc <- winred_item_contribs_all %>% 
+  filter(
+    str_detect(memo_text, "DONALD J. TRUMP FOR PRESIDENT, INC.") |
+      str_detect(memo_text, "TRUMP MAKE AMERICA GREAT AGAIN COMMITTEE") |
+      str_detect(memo_text, "TRUMP VICTORY") |
+      str_detect(memo_text, "REPUBLICAN NATIONAL COMMITTEE"),
+      !str_detect(memo_text, "COLLEGE REPUBLICAN NATIONAL"),
+  ) 
+
+
+winred_itemcontribs_trump_rnc <- winred_itemcontribs_trump_rnc %>% 
+  mutate(
+    received_by = str_remove(memo_text, "Earmarked for ")
+  ) %>% 
+  select(
+    received_by, everything()
+  )
+
+#save results
+saveRDS(winred_itemcontribs_trump_rnc, "processed_data/winred_itemcontribs_trump_rnc.rds")
 
 
 
