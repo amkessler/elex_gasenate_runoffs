@@ -382,6 +382,10 @@ dem10 <- zipcompare %>%
 dem10 <- dem10 %>%
   mutate(zipname = fct_reorder(zipname, demtotal)) 
 
+#export to file
+write_csv(dem10, "output/dem10.csv")
+
+
 #chart it out
 d <- ggplot(dem10, aes(zipname, demtotal)) + geom_col(fill = "darkblue") + coord_flip() +
   theme_minimal()
@@ -396,6 +400,8 @@ d2 <- d + labs(title="GA Runoffs: Top ActBlue zip codes",
   scale_y_continuous(labels=dollar) 
 
 d2
+
+
 
 # dd <- ggplotly(d2) 
 # 
@@ -425,6 +431,10 @@ gop10 <- zipcompare %>%
 #reorder factor to allow for descending bars
 gop10 <- gop10 %>%
   mutate(zipname = fct_reorder(zipname, goptotal)) 
+
+#export to file
+write_csv(gop10, "output/gop10.csv")
+
 
 #chart it out
 p <- ggplot(gop10, aes(zipname, goptotal)) + geom_col(fill = "darkred") + coord_flip() +
