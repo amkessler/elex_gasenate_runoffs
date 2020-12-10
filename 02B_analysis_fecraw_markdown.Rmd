@@ -565,13 +565,13 @@ t_gop <- zipcompare %>%
   select(zip_code, total = goptotal) %>%
   mutate(party = "R") %>% 
   arrange(desc(total)) %>% 
-  head(50)
+  head(250)
 
 t_dem <- zipcompare %>% 
   select(zip_code, total = demtotal) %>% 
   mutate(party = "D") %>% 
   arrange(desc(total)) %>% 
-  head(50)
+  head(250)
 
 #combine
 t_both <- bind_rows(t_dem, t_gop)
