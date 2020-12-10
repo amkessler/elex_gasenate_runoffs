@@ -559,8 +559,26 @@ saveRDS(m1, "savedmap_zipcompare.rds")
 
 ```{r}
 
+#### top zips for each party
 
+t_gop <- zipcompare %>% 
+  select(zip_code, total = goptotal) %>%
+  mutate(party = "R") %>% 
+  arrange(desc(total)) %>% 
+  head(50)
 
+t_dem <- zipcompare %>% 
+  select(zip_code, total = demtotal) %>% 
+  mutate(party = "D") %>% 
+  arrange(desc(total)) %>% 
+  head(50)
+
+#combine
+t_both <- bind_rows(t_dem, t_gop)
+
+t_both
+
+t_both %>% write_xlsx("output/t_both.xlsx")
 
 ```
 
