@@ -233,7 +233,7 @@ write_xlsx(zipcompare, "output/zipcompare.xlsx")
 ```
 
 
-## Totals
+# Totals 
 
 #### Actblue
 
@@ -254,7 +254,7 @@ winred_contribs %>%
 ```
 
 ###
-## In-State vs. Out-of-State
+# In-State vs. Out-of-State
   
   
 **Dem overall totals**
@@ -464,7 +464,7 @@ d2
 # Zip Codes
 
 
-**Top Zips for Democrats (ActBlue)**
+**Top Zips for Democratic Total Contributions (ActBlue)**
 
 ```{r}
 
@@ -514,7 +514,46 @@ d2
 ```
 
 
-**Top Zips for Republicans (WinRed)**
+**Top Zips for Democratic Advantage (ActBlue)**
+
+```{r}
+
+#pull out top zips for the dems
+dem10_adv <- zipcompare %>% 
+  filter(winner == "D") %>% 
+  arrange(desc(advantage)) %>% 
+  head(15)
+
+#reorder factor to allow for descending bars
+dem10_adv <- dem10_adv %>%
+  mutate(zipname = fct_reorder(zipname, advantage)) 
+
+#export to file
+write_csv(dem10_adv, "output/dem10_adv.csv")
+
+
+#chart it out
+d <- ggplot(dem10_adv, aes(zipname, advantage)) + geom_col(fill = "darkblue") + coord_flip() +
+  theme_minimal()
+
+#add extra elements to the chart and convert to ggplotly
+d2 <- d + labs(title="GA Runoffs: Top Zips Where Grassroots Dems Outraised GOP",
+               subtitle = "(bars show advantage in dollars raised)",
+               caption = "Source: FEC, Bloomberg Analysis",
+               x ="", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(plot.subtitle = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous(labels=dollar) 
+
+d2
+
+```
+
+
+
+
+**Top Zips for Republican Total Contributions (WinRed)**
 
 ```{r}
 
@@ -566,6 +605,48 @@ p2
 
 
 ```
+
+**Top Zips for Republican Advantage (WinRed)**
+
+```{r}
+
+
+#pull out top zips 
+gop10_adv <- zipcompare %>% 
+  filter(winner == "R") %>% 
+  arrange(desc(advantage)) %>% 
+  head(15)
+
+#reorder factor to allow for descending bars
+gop10_adv <- gop10_adv %>%
+  mutate(zipname = fct_reorder(zipname, advantage)) 
+
+#export to file
+write_csv(gop10_adv, "output/gop10_adv.csv")
+
+
+#chart it out
+d <- ggplot(gop10_adv, aes(zipname, advantage)) + geom_col(fill = "darkred") + coord_flip() +
+  theme_minimal()
+
+#add extra elements to the chart and convert to ggplotly
+d2 <- d + labs(title="GA Runoffs: Top Zips Where Grassroots GOP Outraised Dems",
+               subtitle = "(bars show advantage in dollars raised)",
+               caption = "Source: FEC, Bloomberg Analysis",
+               x ="", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(plot.subtitle = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous(labels=dollar) 
+
+d2
+
+```
+
+
+
+
+
 
 ## Zip Maps
 
@@ -672,8 +753,6 @@ t_dem <- zipcompare %>%
 
 #combine
 t_both <- bind_rows(t_dem, t_gop)
-
-t_both
 
 t_both %>% write_xlsx("output/t_both.xlsx")
 
