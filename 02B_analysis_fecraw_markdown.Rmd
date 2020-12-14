@@ -1,6 +1,6 @@
 ---
 title: "GA Senate Runoffs"
-author: "Aaron Kessler & Bill Allison"
+author: "Aaron Kessler"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output: 
   html_document:
@@ -263,6 +263,9 @@ winred_contribs %>%
 dem_inout <- actblue_contribs %>% 
   group_by(in_out_state) %>% 
   summarise(total_dollars = sum(contribution_amount)) %>% 
+  mutate(
+    pct_of_total = round_half_up(total_dollars/sum(total_dollars)*100, 1)
+    ) %>% 
   ungroup()
 
 dem_inout
@@ -274,6 +277,9 @@ dem_inout
 dem_bystate <- actblue_contribs %>% 
   group_by(contributor_state) %>% 
   summarise(total_dollars = sum(contribution_amount)) %>% 
+  mutate(
+    pct_of_total = round_half_up(total_dollars/sum(total_dollars)*100, 1)
+    ) %>% 
   arrange(desc(total_dollars)) %>% 
   ungroup() %>% 
   head(15)
@@ -288,6 +294,9 @@ dem_bystate
 dem_inout_bycand <- actblue_contribs %>% 
   group_by(ga_candidate, in_out_state) %>% 
   summarise(total_dollars = sum(contribution_amount)) %>% 
+  mutate(
+    pct_of_total = round_half_up(total_dollars/sum(total_dollars)*100, 1)
+    ) %>% 
   ungroup()
 
 dem_inout_bycand
@@ -355,6 +364,9 @@ d2
 gop_inout <- winred_contribs %>%
   group_by(in_out_state) %>%
   summarise(total_dollars = sum(contribution_amount)) %>%
+  mutate(
+    pct_of_total = round_half_up(total_dollars/sum(total_dollars)*100, 1)
+    ) %>% 
   ungroup()
 
 gop_inout
@@ -366,6 +378,9 @@ gop_inout
 gop_bystate <- winred_contribs %>% 
   group_by(contributor_state) %>% 
   summarise(total_dollars = sum(contribution_amount)) %>% 
+  mutate(
+    pct_of_total = round_half_up(total_dollars/sum(total_dollars)*100, 1)
+    ) %>% 
   arrange(desc(total_dollars)) %>% 
   ungroup() %>% 
   head(15)
@@ -381,6 +396,9 @@ gop_bystate
 gop_inout_bycand <- winred_contribs %>%
   group_by(ga_candidate, in_out_state) %>%
   summarise(total_dollars = sum(contribution_amount)) %>%
+  mutate(
+    pct_of_total = round_half_up(total_dollars/sum(total_dollars)*100, 1)
+    ) %>% 
   ungroup()
 
 gop_inout_bycand
