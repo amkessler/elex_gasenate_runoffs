@@ -255,8 +255,9 @@ winred_contribs %>%
 
 ###
 # In-State vs. Out-of-State
-  
-  
+
+### Party Totals 
+
 **Dem overall totals**
 ```{r}
 
@@ -270,6 +271,23 @@ dem_inout <- actblue_contribs %>%
 
 dem_inout
 ```
+
+**GOP overall totals**
+```{r}
+
+gop_inout <- winred_contribs %>%
+  group_by(in_out_state) %>%
+  summarise(total_dollars = sum(contribution_amount)) %>%
+  mutate(
+    pct_of_total = round_half_up(total_dollars/sum(total_dollars)*100, 1)
+    ) %>% 
+  ungroup()
+
+gop_inout
+```
+
+
+### Dem Totals By State, Candidate
 
 **Dem totals by top states**
 ```{r}
@@ -358,19 +376,7 @@ d2
 ```
 
 
-**GOP overall totals**
-```{r}
-
-gop_inout <- winred_contribs %>%
-  group_by(in_out_state) %>%
-  summarise(total_dollars = sum(contribution_amount)) %>%
-  mutate(
-    pct_of_total = round_half_up(total_dollars/sum(total_dollars)*100, 1)
-    ) %>% 
-  ungroup()
-
-gop_inout
-```
+### GOP Totals By State, Candidate
 
 **GOP totals by top states**
 ```{r}
