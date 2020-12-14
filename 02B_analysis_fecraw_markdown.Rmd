@@ -651,7 +651,6 @@ d2
 ## Zip Maps
 
 ```{r}
-
 #bring in comparison table created above
 zipcompare <- readRDS("zip_data/zipcompare.rds")
 
@@ -690,9 +689,10 @@ zip_map$winner <- as.factor(zip_map$winner)
 #add dollar formatting
 zip_map$demdisplay <- dollar(zip_map$demtotal)
 zip_map$gopdisplay <- dollar(zip_map$goptotal)
+```
 
-
-
+National zipcode map of Dem vs. GOP advantage in contributions
+```{r}
 #### MAPPING POINTS ##### ---------------------------------------
 
 factpal <- colorFactor(c("blue","red"), zip_map$winner)
@@ -729,10 +729,53 @@ saveRDS(m1, "savedmap_zipcompare.rds")
 
 
 
+```
+
+
+
+Atlanta-area-only zipcode map of Dem vs. GOP advantage in contributions
+```{r}
+
+#filter for just GA
+zip_map <- zip_map %>% 
+  filter(state == "GA")
+
+factpal <- colorFactor(c("blue","red"), zip_map$winner)
+
+#labels
+labs1 <- lapply(seq(nrow(zip_map)), function(i) {
+  paste0( '<p>', 'Zip code: ', '<strong>', zip_map[i, "GEOID"], '</strong></p>',
+          '<p></p>', 
+          "Democrats: ", zip_map[i, "demdisplay"],
+          '<p></p>', 
+          "Republicans: ", zip_map[i, "gopdisplay"]
+  ) 
+})
+
+m2 <- leaflet(zip_map) %>% 
+  addTiles() %>%
+  addCircles(lng = ~lon, lat = ~lat, weight = .4,
+             stroke = FALSE, fillOpacity = .25,
+             radius = ~sqrt(advantage) * 20, 
+             fillColor = ~factpal(winner),
+             label = lapply(labs1, HTML)
+  ) %>%
+  addControl("ActBlue vs. WinRed - GA Senate candidate contributions by zip code", position = "topright") %>%
+  setView(-84.3880, 33.7490, zoom = 9)
+
+m2
+
+#save to frameable file for CMS
+htmlwidgets::saveWidget(frameableWidget(m2),'gasenate_actblue_vs_winred_zippoints_ATLONLY.html')
+
+# save as rds object
+saveRDS(m2, "savedmap_zipcompare_ATLONLY.rds")
 
 
 
 ```
+
+
 
 
 ```{r}
