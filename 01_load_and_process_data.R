@@ -29,10 +29,13 @@ actblue_fecraw_contribs_postelex <- actblue_fecraw_contribs_all %>%
 saveRDS(actblue_fecraw_contribs_all, "processed_data/actblue_fecraw_contribs_all.rds")
 saveRDS(actblue_fecraw_contribs_postelex, "processed_data/actblue_fecraw_contribs_postelex.rds")
 
-actblue_fecraw_contribs_postelex_GASEN %>% 
-  head(1000) %>% 
-  View()
-
+#look for dem candidate committee name variations
+actblue_fecraw_contribs_postelex %>% 
+  filter(
+    str_detect(memo_text_description, "OSSOFF") |
+      str_detect(memo_text_description, "WARNOCK")
+  ) %>% 
+  count(memo_text_description)
 
 #use ossoff and warnock variations to filter actblue ####
 #and create new columns to standardize
@@ -41,33 +44,49 @@ actblue_fecraw_contribs_postelex_GASEN <- actblue_fecraw_contribs_postelex %>%
     str_detect(memo_text_description, "JON OSSOFF FOR SENATE") |
       str_detect(memo_text_description, "OSSOFF VICTORY FUND") |
       str_detect(memo_text_description, "WARNOCK FOR GEORGIA") |
-      str_detect(memo_text_description, "WARNOCK VICTORY FUND")
+      str_detect(memo_text_description, "WARNOCK VICTORY FUND") |
+      str_detect(memo_text_description, "OSSOFF-WARNOCK VICTORY FUND")
   ) %>% 
   mutate(
     ga_committee = case_when(
       str_detect(memo_text_description, "JON OSSOFF FOR SENATE") ~ "JON OSSOFF FOR SENATE",
       str_detect(memo_text_description, "OSSOFF VICTORY FUND") ~ "OSSOFF VICTORY FUND",
       str_detect(memo_text_description, "WARNOCK FOR GEORGIA") ~ "WARNOCK FOR GEORGIA",
-      str_detect(memo_text_description, "WARNOCK VICTORY FUND") ~ "WARNOCK VICTORY FUND"
+      str_detect(memo_text_description, "WARNOCK VICTORY FUND") ~ "WARNOCK VICTORY FUND",
+      str_detect(memo_text_description, "OSSOFF-WARNOCK VICTORY FUND") ~ "OSSOFF-WARNOCK VICTORY FUND"
     ),    
     ga_candidate = case_when(
       str_detect(memo_text_description, "JON OSSOFF FOR SENATE") ~ "OSSOFF",
       str_detect(memo_text_description, "OSSOFF VICTORY FUND") ~ "OSSOFF",
       str_detect(memo_text_description, "WARNOCK FOR GEORGIA") ~ "WARNOCK",
-      str_detect(memo_text_description, "WARNOCK VICTORY FUND") ~ "WARNOCK"
+      str_detect(memo_text_description, "WARNOCK VICTORY FUND") ~ "WARNOCK",
+      str_detect(memo_text_description, "OSSOFF-WARNOCK VICTORY FUND") ~ "OSSOFF-WARNOCK JOINTLY"
     ),
     ga_party = case_when(
       ga_candidate == "OSSOFF" ~ "D",
-      ga_candidate == "WARNOCK" ~ "D"
+      ga_candidate == "WARNOCK" ~ "D",
+      ga_candidate == "OSSOFF-WARNOCK JOINTLY" ~ "D"
     ),
     in_out_state = if_else(contributor_state == "GA", "IN", "OUT")
   ) %>% 
   select(ga_party, ga_candidate, everything())
 
+
+#looking for any refunds (*none found)
+actblue_fecraw_contribs_postelex_GASEN %>% 
+  filter(
+    str_detect(str_to_upper(contribution_purpose_descrip), "REFUND")
+  )
+
+actblue_fecraw_contribs_postelex_GASEN %>% 
+  count(contribution_purpose_descrip) 
+
+
 #save for next steps
 saveRDS(actblue_fecraw_contribs_postelex_GASEN, "processed_data/actblue_fecraw_contribs_postelex_GASEN.rds")
 #save for sharing with others
 write_csv(actblue_fecraw_contribs_postelex_GASEN, "processed_data/actblue_fecraw_contribs_postelex_GASEN.csv")
+
 
 
 
@@ -96,35 +115,41 @@ winred_fecraw_contribs_postelex <- winred_fecraw_contribs_all %>%
 saveRDS(winred_fecraw_contribs_all, "processed_data/winred_fecraw_contribs_all.rds")
 saveRDS(winred_fecraw_contribs_postelex, "processed_data/winred_fecraw_contribs_postelex.rds")
 
-winred_fecraw_contribs_postelex %>%
-  head(1000) %>%
-  View()
-
+#look for gop candidate committee name variations
 winred_fecraw_contribs_postelex %>% 
-  count(committee)
+  filter(
+    str_detect(contribution_purpose_descrip, "PERDUE") |
+      str_detect(contribution_purpose_descrip, "LOEFFLER")
+  ) %>% 
+  count(contribution_purpose_descrip)
 
-
-#use ossoff and warnock variations to filter winred ####
+#use variations to filter winred ####
 #and create new columns to standardize
 winred_fecraw_contribs_postelex_GASEN <- winred_fecraw_contribs_postelex %>% 
   filter(
     str_detect(contribution_purpose_descrip, "PERDUE FOR SENATE") |
       str_detect(contribution_purpose_descrip, "PERDUE VICTORY INC") |
       str_detect(contribution_purpose_descrip, "FRIENDS OF DAVID PERDUE") |
-      str_detect(contribution_purpose_descrip, "GEORGIANS FOR KELLY LOEFFLER")
+      str_detect(contribution_purpose_descrip, "GEORGIANS FOR KELLY LOEFFLER") |
+      str_detect(contribution_purpose_descrip, "TEAM LOEFFLER") |
+      str_detect(contribution_purpose_descrip, "TEAM PERDUE")
   ) %>% 
   mutate(
     ga_committee = case_when(
       str_detect(contribution_purpose_descrip, "PERDUE FOR SENATE") ~ "PERDUE FOR SENATE",
       str_detect(contribution_purpose_descrip, "PERDUE VICTORY INC") ~ "PERDUE VICTORY INC",
       str_detect(contribution_purpose_descrip, "FRIENDS OF DAVID PERDUE") ~ "FRIENDS OF DAVID PERDUE",
-      str_detect(contribution_purpose_descrip, "GEORGIANS FOR KELLY LOEFFLER") ~ "GEORGIANS FOR KELLY LOEFFLER"
+      str_detect(contribution_purpose_descrip, "GEORGIANS FOR KELLY LOEFFLER") ~ "GEORGIANS FOR KELLY LOEFFLER",
+      str_detect(contribution_purpose_descrip, "TEAM LOEFFLER") ~ "TEAM LOEFFLER",
+      str_detect(contribution_purpose_descrip, "TEAM PERDUE") ~ "TEAM PERDUE"
     ),    
     ga_candidate = case_when(
       str_detect(contribution_purpose_descrip, "PERDUE FOR SENATE") ~ "PERDUE",
       str_detect(contribution_purpose_descrip, "PERDUE VICTORY INC") ~ "PERDUE",
       str_detect(contribution_purpose_descrip, "FRIENDS OF DAVID PERDUE") ~ "PERDUE",
-      str_detect(contribution_purpose_descrip, "GEORGIANS FOR KELLY LOEFFLER") ~ "LOEFFLER"
+      str_detect(contribution_purpose_descrip, "GEORGIANS FOR KELLY LOEFFLER") ~ "LOEFFLER",
+      str_detect(contribution_purpose_descrip, "TEAM LOEFFLER") ~ "LOEFFLER",
+      str_detect(contribution_purpose_descrip, "TEAM PERDUE") ~ "PERDUE"
     ),
     ga_party = case_when(
       ga_candidate == "PERDUE" ~ "R",
@@ -133,8 +158,22 @@ winred_fecraw_contribs_postelex_GASEN <- winred_fecraw_contribs_postelex %>%
     in_out_state = if_else(contributor_state == "GA", "IN", "OUT")
   ) %>% 
   select(ga_party, ga_candidate, everything())
-  
+
 glimpse(winred_fecraw_contribs_postelex_GASEN)  
+
+
+#looking for any refunds (*none found)
+winred_fecraw_contribs_postelex_GASEN %>% 
+  filter(
+    str_detect(str_to_upper(contribution_purpose_descrip), "REFUND")
+  )
+
+winred_fecraw_contribs_postelex_GASEN %>% 
+  count(contribution_purpose_descrip) 
+
+winred_fecraw_contribs_postelex_GASEN %>% 
+  count(memo_text_description) 
+
 
 #save for next steps
 saveRDS(winred_fecraw_contribs_postelex_GASEN, "processed_data/winred_fecraw_contribs_postelex_GASEN.rds")
